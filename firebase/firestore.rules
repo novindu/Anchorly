@@ -1,0 +1,74 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function userDoc() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+
+    function userFamilyId() {
+      return userDoc().data.familyId;
+    }
+
+    function belongsToFamily(familyId) {
+      return isSignedIn() && userFamilyId() == familyId;
+    }
+
+    // Users — owner controls their own record (stores role + familyId)
+    match /users/{userId} {
+      allow read: if isSignedIn() && (
+        request.auth.uid == userId ||
+        (resource.data.familyId != null && belongsToFamily(resource.data.familyId))
+      );
+      allow create, update: if isSignedIn() && request.auth.uid == userId;
+      allow delete: if false;
+    }
+
+    // Family groups — members of the family only
+    match /family_groups/{familyId} {
+      allow read, update: if belongsToFamily(familyId);
+      allow create: if isSignedIn();
+      allow delete: if false;
+    }
+
+    // Tasks — family-scoped when familyId present on document
+    match /tasks/{taskId} {
+      allow read, write: if isSignedIn() && (
+        !('familyId' in resource.data) || belongsToFamily(resource.data.familyId)
+      );
+      allow create: if isSignedIn();
+    }
+
+    // Outbound authorization queue
+    match /outbound_queue/{itemId} {
+      allow read, create, update: if isSignedIn();
+      allow delete: if false;
+    }
+
+    // Address book
+    match /address_book/{contactId} {
+      allow read, write: if isSignedIn() && (
+        !('familyId' in resource.data) || belongsToFamily(resource.data.familyId)
+      );
+      allow create: if isSignedIn();
+    }
+
+    // Audit logs — append-only
+    match /audit_logs/{logId} {
+      allow read, create: if isSignedIn();
+      allow update, delete: if false;
+    }
+
+    // Signatures metadata (encrypted payload stays on device)
+    match /signatures/{signatureId} {
+      allow read, write: if isSignedIn() && (
+        !('familyId' in resource.data) || belongsToFamily(resource.data.familyId)
+      );
+      allow create: if isSignedIn();
+    }
+  }
+}

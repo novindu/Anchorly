@@ -1,0 +1,21 @@
+// Export pages
+export '/pages/a_i_analysis_recipient_cross_check/a_i_analysis_recipient_cross_check_widget.dart'
+    show AIAnalysisRecipientCrossCheckWidget;
+export '/pages/audit_log_privacy_ledger/audit_log_privacy_ledger_widget.dart'
+    show AuditLogPrivacyLedgerWidget;
+export '/pages/document_capture_a_i_disclaimer/document_capture_a_i_disclaimer_widget.dart'
+    show DocumentCaptureAIDisclaimerWidget;
+export '/pages/family_address_book/family_address_book_widget.dart'
+    show FamilyAddressBookWidget;
+export '/pages/family_dashboard/family_dashboard_widget.dart'
+    show FamilyDashboardWidget;
+export '/pages/family_member_management/family_member_management_widget.dart'
+    show FamilyMemberManagementWidget;
+export '/pages/onboarding_local_setup/onboarding_local_setup_widget.dart'
+    show OnboardingLocalSetupWidget;
+export '/pages/outbound_authorization_queue/outbound_authorization_queue_widget.dart'
+    show OutboundAuthorizationQueueWidget;
+export '/pages/secure_signature_vault/secure_signature_vault_widget.dart'
+    show SecureSignatureVaultWidget;
+export '/pages/task_creator_pre_send_checklist/task_creator_pre_send_checklist_widget.dart'
+    show TaskCreatorPreSendChecklistWidget;
