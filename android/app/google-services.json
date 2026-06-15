@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "691786368396",
+    "project_id": "anchorly-da184",
+    "storage_bucket": "anchorly-da184.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:691786368396:android:a24b86077f852ba13302a9",
+        "android_client_info": {
+          "package_name": "com.mycompany.anchorly"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD8D1JSKawtKi-wJg_pH_Yiswj99upYu0M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

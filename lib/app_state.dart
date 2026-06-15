@@ -1,0 +1,34 @@
+import 'package:flutter/material.dart';
+
+class FFAppState extends ChangeNotifier {
+  static FFAppState _instance = FFAppState._internal();
+
+  factory FFAppState() {
+    return _instance;
+  }
+
+  FFAppState._internal();
+
+  static void reset() {
+    _instance = FFAppState._internal();
+  }
+
+  Future initializePersistedState() async {}
+
+  void update(VoidCallback callback) {
+    callback();
+    notifyListeners();
+  }
+
+  String _currentUserRole = 'Adult';
+  String get currentUserRole => _currentUserRole;
+  set currentUserRole(String value) {
+    _currentUserRole = value;
+  }
+
+  String _activeFamilyId = '';
+  String get activeFamilyId => _activeFamilyId;
+  set activeFamilyId(String value) {
+    _activeFamilyId = value;
+  }
+}
