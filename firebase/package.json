@@ -5,6 +5,7 @@
     "deploy:rules": "node scripts/deploy-rules.mjs",
     "deploy:hosting": "node scripts/deploy-hosting.mjs",
     "preflight:auth": "node scripts/test-initialize-flow.mjs",
+    "e2e:initialize": "node scripts/e2e-initialize-app-flow.mjs",
     "deploy:beta": "node scripts/deploy-rules.mjs && node scripts/deploy-hosting.mjs"
   },
   "devDependencies": {
