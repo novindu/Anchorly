@@ -55,6 +55,7 @@ class _FamilyAddressBookWidgetState extends State<FamilyAddressBookWidget> {
       child: Scaffold(
         key: scaffoldKey,
         backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+        bottomNavigationBar: const DashboardBottomBar(),
         body: Column(
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.start,
@@ -302,8 +303,6 @@ class _FamilyAddressBookWidgetState extends State<FamilyAddressBookWidget> {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 12),
-                        const HomeNavButton(showLabel: true),
                       ],
                     ),
                   ),

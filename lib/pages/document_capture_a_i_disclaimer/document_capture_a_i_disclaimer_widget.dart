@@ -54,6 +54,7 @@ class _DocumentCaptureAIDisclaimerWidgetState
       child: Scaffold(
         key: scaffoldKey,
         backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+        bottomNavigationBar: const DashboardBottomBar(),
         body: Stack(
           alignment: AlignmentDirectional(-1.0, -1.0),
           children: [
