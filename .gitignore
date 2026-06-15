@@ -20,6 +20,9 @@ unlinked_spec.ds
 *.env
 .env.*
 **/google-services.json
+firebase/service-account.json
+firebase/node_modules/
+**/service-account*.json
 **/GoogleService-Info.plist
 firebase_options.dart
 
