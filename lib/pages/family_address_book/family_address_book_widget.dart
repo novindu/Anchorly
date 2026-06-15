@@ -10,6 +10,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import '/custom_code/navigation_helpers.dart';
 import 'family_address_book_model.dart';
 export 'family_address_book_model.dart';
 
@@ -72,17 +73,23 @@ class _FamilyAddressBookWidgetState extends State<FamilyAddressBookWidget> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      FlutterFlowIconButton(
-                        borderRadius: 8.0,
-                        buttonSize: 40.0,
-                        fillColor: Colors.transparent,
-                        icon: Icon(
-                          Icons.arrow_back_rounded,
-                          size: 24.0,
-                        ),
-                        onPressed: () async {
-                          context.pop();
-                        },
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          FlutterFlowIconButton(
+                            borderRadius: 8.0,
+                            buttonSize: 40.0,
+                            fillColor: Colors.transparent,
+                            icon: Icon(
+                              Icons.arrow_back_rounded,
+                              size: 24.0,
+                            ),
+                            onPressed: () async {
+                              navigateBackOrHome(context);
+                            },
+                          ),
+                          const HomeNavButton(),
+                        ],
                       ),
                       Text(
                         'Family Address Book',
@@ -261,26 +268,43 @@ class _FamilyAddressBookWidgetState extends State<FamilyAddressBookWidget> {
                   Padding(
                     padding:
                         EdgeInsetsDirectional.fromSTEB(32.0, 16.0, 32.0, 32.0),
-                    child: Container(
-                      child: wrapWithModel(
-                        model: _model.buttonModel,
-                        updateCallback: () => safeSetState(() {}),
-                        child: ButtonWidget(
-                          content: 'Add New Recipient',
-                          icon: Icon(
-                            Icons.add_rounded,
-                            color: FlutterFlowTheme.of(context).onPrimary,
-                            size: 16.0,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        InkWell(
+                          onTap: () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  'Add recipient form coming soon. Use Home to return to Dashboard.',
+                                ),
+                              ),
+                            );
+                          },
+                          child: wrapWithModel(
+                            model: _model.buttonModel,
+                            updateCallback: () => safeSetState(() {}),
+                            child: ButtonWidget(
+                              content: 'Add New Recipient',
+                              icon: Icon(
+                                Icons.add_rounded,
+                                color:
+                                    FlutterFlowTheme.of(context).onPrimary,
+                                size: 16.0,
+                              ),
+                              iconPresent: true,
+                              iconEndPresent: false,
+                              variant: 'primary',
+                              size: 'large',
+                              fullWidth: true,
+                              loading: false,
+                              disabled: false,
+                            ),
                           ),
-                          iconPresent: true,
-                          iconEndPresent: false,
-                          variant: 'primary',
-                          size: 'large',
-                          fullWidth: true,
-                          loading: false,
-                          disabled: false,
                         ),
-                      ),
+                        const SizedBox(height: 12),
+                        const HomeNavButton(showLabel: true),
+                      ],
                     ),
                   ),
                 ],

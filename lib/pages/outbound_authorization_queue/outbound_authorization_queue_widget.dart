@@ -7,6 +7,7 @@ import '/flutter_flow/flutter_flow_widgets.dart';
 import 'dart:ui';
 import '/flutter_flow/custom_functions.dart' as functions;
 import '/custom_code/family_query_helpers.dart';
+import '/custom_code/navigation_helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -125,9 +126,10 @@ class _OutboundAuthorizationQueueWidgetState
                                   size: 24.0,
                                 ),
                                 onPressed: () async {
-                                  context.pop();
+                                  navigateBackOrHome(context);
                                 },
                               ),
+                              const HomeNavButton(),
                               Expanded(
                                 flex: 1,
                                 child: Column(

@@ -12,6 +12,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'secure_signature_vault_model.dart';
 import '/custom_code/encryption/anchorly_encryption.dart';
+import '/custom_code/navigation_helpers.dart';
 
 // E2EE wiring note (local heavy sync with FF7 cloud + pain point completion):
 // The AnchorlyEncryption service (AES-256-GCM + PBKDF2 + secure storage) is imported and the UI advertises "real client-side AES E2EE now active".
@@ -140,9 +141,10 @@ class _SecureSignatureVaultWidgetState
                                       size: 20.0,
                                     ),
                                     onPressed: () async {
-                                      context.pop();
+                                      navigateBackOrHome(context);
                                     },
                                   ),
+                                  const HomeNavButton(),
                                   Icon(
                                     Icons.fingerprint_rounded,
                                     color: Color(0xFF2A4D69),

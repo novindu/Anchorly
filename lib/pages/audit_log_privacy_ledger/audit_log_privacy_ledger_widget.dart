@@ -9,6 +9,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import '/custom_code/navigation_helpers.dart';
 import 'audit_log_privacy_ledger_model.dart';
 export 'audit_log_privacy_ledger_model.dart';
 
@@ -89,9 +90,10 @@ class _AuditLogPrivacyLedgerWidgetState
                                   size: 24.0,
                                 ),
                                 onPressed: () async {
-                                  context.pop();
+                                  navigateBackOrHome(context);
                                 },
                               ),
+                              const HomeNavButton(),
                               Expanded(
                                 flex: 1,
                                 child: Column(

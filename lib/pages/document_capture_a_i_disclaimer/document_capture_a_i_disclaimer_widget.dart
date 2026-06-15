@@ -8,6 +8,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import '/custom_code/navigation_helpers.dart';
 import 'document_capture_a_i_disclaimer_model.dart';
 export 'document_capture_a_i_disclaimer_model.dart';
 
@@ -108,9 +109,10 @@ class _DocumentCaptureAIDisclaimerWidgetState
                                   size: 24.0,
                                 ),
                                 onPressed: () async {
-                                  context.pop();
+                                  navigateBackOrHome(context);
                                 },
                               ),
+                              const HomeNavButton(),
                               Text(
                                 'Capture Document',
                                 style: FlutterFlowTheme.of(context)

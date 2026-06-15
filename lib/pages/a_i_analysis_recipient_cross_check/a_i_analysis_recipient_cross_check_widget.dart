@@ -11,6 +11,7 @@ import '/index.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import '/custom_code/navigation_helpers.dart';
 import 'a_i_analysis_recipient_cross_check_model.dart';
 export 'a_i_analysis_recipient_cross_check_model.dart';
 
@@ -106,9 +107,10 @@ class _AIAnalysisRecipientCrossCheckWidgetState
                               size: 20.0,
                             ),
                             onPressed: () async {
-                              context.pop();
+                              navigateBackOrHome(context);
                             },
                           ),
+                          const HomeNavButton(),
                           Text(
                             'AI Analysis Check',
                             style: FlutterFlowTheme.of(context)

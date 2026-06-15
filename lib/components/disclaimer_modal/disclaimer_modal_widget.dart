@@ -7,6 +7,7 @@ import '/index.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import '/custom_code/navigation_helpers.dart';
 import 'disclaimer_modal_model.dart';
 export 'disclaimer_modal_model.dart';
 
@@ -254,7 +255,7 @@ class _DisclaimerModalWidgetState extends State<DisclaimerModalWidget> {
                           hoverColor: Colors.transparent,
                           highlightColor: Colors.transparent,
                           onTap: () async {
-                            context.pop();
+                            navigateBackOrHome(context);
                           },
                           child: wrapWithModel(
                             model: _model.buttonModel1,
