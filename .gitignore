@@ -4,6 +4,8 @@
 .pub-cache/
 .pub/
 build/
+.chrome-dev/
+.flutter-tmp/
 flutter_*.png
 linked_*.ds
 unlinked.ds
