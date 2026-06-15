@@ -6,6 +6,7 @@ import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import 'dart:ui';
 import '/index.dart';
+import '/custom_code/actions/ensure_anonymous_auth.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -584,7 +585,7 @@ Column(
 
                                         try {
                                           final firestore = FirebaseFirestore.instance;
-                                          final authUser = FirebaseAuth.instance.currentUser; // relies on existing auth setup in project
+                                          final authUser = await ensureAnonymousAuth();
 
                                           // Create new family group (use auto-ID so we have a real ref immediately)
                                           final newFamilyRef = firestore.collection('family_groups').doc();
@@ -598,13 +599,22 @@ Column(
                                           });
 
                                           // Write back to the logged-in user doc (hydration source of truth)
-                                          if (authUser != null) {
-                                            await firestore.collection('users').doc(authUser.uid).set({
-                                              'familyId': newFamilyId,
-                                              'role': 'Adult',
-                                              // preserve other fields if any
-                                            }, SetOptions(merge: true));
-                                          }
+                                          await firestore.collection('users').doc(authUser.uid).set({
+                                            'familyId': newFamilyId,
+                                            'role': 'Adult',
+                                            'name': 'Family Admin',
+                                            'initials': 'FA',
+                                            'status': 'active',
+                                          }, SetOptions(merge: true));
+
+                                          await firestore.collection('audit_logs').add({
+                                            'actionType': 'VAULT_INITIALIZED',
+                                            'actorName': 'Family Admin',
+                                            'timestamp': DateTime.now().toIso8601String(),
+                                            'detailIcon': 'shield',
+                                            'detailText': 'Family vault initialized',
+                                            'familyId': newFamilyId,
+                                          });
 
                                           // Hydrate AppState right away (fixes the reliable hydration pain point)
                                           FFAppState().activeFamilyId = newFamilyId;

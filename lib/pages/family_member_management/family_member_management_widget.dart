@@ -8,6 +8,7 @@ import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import 'dart:ui';
 import '/index.dart';
+import '/custom_code/family_query_helpers.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -267,7 +268,12 @@ class _FamilyMemberManagementWidgetState
 
                                 // ff_lite_listview_data:${users.all}
                                 StreamBuilder<List<UsersRecord>>(
-                                  stream: queryUsersRecord(),
+                                  stream: queryUsersRecord(
+                                    queryBuilder: (q) => familyScopedQuery(
+                                      q,
+                                      familyId: widget.familyGroupRef?.id,
+                                    ),
+                                  ),
                                   builder: (context, snapshot) {
                                     // Customize what your widget looks like when it's loading.
                                     if (!snapshot.hasData) {

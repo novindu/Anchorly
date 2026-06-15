@@ -6,6 +6,7 @@ import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import 'dart:ui';
 import '/flutter_flow/custom_functions.dart' as functions;
+import '/custom_code/family_query_helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -47,7 +48,9 @@ class _OutboundAuthorizationQueueWidgetState
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<OutboundQueueRecord>>(
-      stream: queryOutboundQueueRecord(),
+      stream: queryOutboundQueueRecord(
+        queryBuilder: (q) => familyScopedQuery(q),
+      ),
       builder: (context, snapshot) {
         // Customize what your widget looks like when it's loading.
         if (!snapshot.hasData) {
@@ -338,7 +341,9 @@ class _OutboundAuthorizationQueueWidgetState
                         Padding(
                       padding: EdgeInsets.all(24.0),
                       child: StreamBuilder<List<OutboundQueueRecord>>(
-                        stream: queryOutboundQueueRecord(),
+                        stream: queryOutboundQueueRecord(
+                          queryBuilder: (q) => familyScopedQuery(q),
+                        ),
                         builder: (context, snapshot) {
                           // Customize what your widget looks like when it's loading.
                           if (!snapshot.hasData) {

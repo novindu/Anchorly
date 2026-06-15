@@ -2,7 +2,9 @@
   "name": "anchorly-firebase",
   "private": true,
   "scripts": {
-    "deploy:rules": "node scripts/deploy-rules.mjs"
+    "deploy:rules": "node scripts/deploy-rules.mjs",
+    "deploy:hosting": "node scripts/deploy-hosting.mjs",
+    "deploy:beta": "node scripts/deploy-rules.mjs && node scripts/deploy-hosting.mjs"
   },
   "devDependencies": {
     "firebase-admin": "^13.0.2",

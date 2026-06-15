@@ -22,6 +22,8 @@ unlinked_spec.ds
 **/google-services.json
 firebase/service-account.json
 firebase/node_modules/
+firebase/hosting-dist/
+firebase/.firebase/
 **/service-account*.json
 **/GoogleService-Info.plist
 firebase_options.dart

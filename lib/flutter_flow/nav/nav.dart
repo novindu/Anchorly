@@ -16,6 +16,7 @@ import '/flutter_flow/flutter_flow_util.dart';
 import 'serialization_util.dart';
 
 import '/index.dart';
+import '/app_state.dart';
 
 export 'package:go_router/go_router.dart';
 export 'serialization_util.dart';
@@ -89,9 +90,14 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
         FFRoute(
           name: '_initialize',
           path: '/',
-          builder: (context, _) => appStateNotifier.loggedIn
-              ? FamilyDashboardWidget()
-              : OnboardingLocalSetupWidget(),
+          builder: (context, _) {
+            final ffState = context.watch<FFAppState>();
+            if (!appStateNotifier.loggedIn ||
+                ffState.activeFamilyId.isEmpty) {
+              return OnboardingLocalSetupWidget();
+            }
+            return FamilyDashboardWidget();
+          },
         ),
         FFRoute(
           name: AIAnalysisRecipientCrossCheckWidget.routeName,

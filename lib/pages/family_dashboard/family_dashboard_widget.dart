@@ -11,6 +11,7 @@ import 'dart:ui';
 import '/flutter_flow/custom_functions.dart' as functions;
 import '/index.dart';
 import '/custom_code/actions/hydrate_ff_app_state.dart';
+import '/custom_code/family_query_helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -31,6 +32,7 @@ class _FamilyDashboardWidgetState extends State<FamilyDashboardWidget> {
   late FamilyDashboardModel _model;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
+  bool _hydrating = true;
 
   @override
   void initState() {
@@ -39,7 +41,12 @@ class _FamilyDashboardWidgetState extends State<FamilyDashboardWidget> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await hydrateFFAppStateFromUserDoc();
-      safeSetState(() {});
+      if (!mounted) return;
+      if (FFAppState().activeFamilyId.isEmpty) {
+        context.goNamed(OnboardingLocalSetupWidget.routeName);
+        return;
+      }
+      safeSetState(() => _hydrating = false);
     });
   }
 
@@ -54,8 +61,23 @@ class _FamilyDashboardWidgetState extends State<FamilyDashboardWidget> {
   Widget build(BuildContext context) {
     context.watch<FFAppState>();
 
+    if (_hydrating || FFAppState().activeFamilyId.isEmpty) {
+      return Scaffold(
+        backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+        body: const Center(
+          child: SizedBox(
+            width: 10.0,
+            height: 10.0,
+            child: CircularProgressIndicator(),
+          ),
+        ),
+      );
+    }
+
     return StreamBuilder<List<OutboundQueueRecord>>(
-      stream: queryOutboundQueueRecord(),
+      stream: queryOutboundQueueRecord(
+        queryBuilder: (q) => familyScopedQuery(q),
+      ),
       builder: (context, snapshot) {
         // Customize what your widget looks like when it's loading.
         if (snapshot.hasError) {
@@ -712,7 +734,9 @@ class _FamilyDashboardWidgetState extends State<FamilyDashboardWidget> {
 
                             // ff_lite_listview_data:${tasks.all}
                             StreamBuilder<List<TasksRecord>>(
-                              stream: queryTasksRecord(),
+                              stream: queryTasksRecord(
+                                queryBuilder: (q) => familyScopedQuery(q),
+                              ),
                               builder: (context, snapshot) {
                                 if (snapshot.hasError) {
                                   return Padding(

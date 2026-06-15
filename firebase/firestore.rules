@@ -18,13 +18,28 @@ service cloud.firestore {
       return isSignedIn() && userFamilyId() == familyId;
     }
 
+    function isAdult() {
+      return isSignedIn() && userDoc().data.role == 'Adult';
+    }
+
     // Users — owner controls their own record (stores role + familyId)
     match /users/{userId} {
       allow read: if isSignedIn() && (
         request.auth.uid == userId ||
         (resource.data.familyId != null && belongsToFamily(resource.data.familyId))
       );
-      allow create, update: if isSignedIn() && request.auth.uid == userId;
+      allow create: if isSignedIn() && (
+        request.auth.uid == userId ||
+        (isAdult() &&
+         request.resource.data.familyId == userFamilyId() &&
+         request.resource.data.familyId != null)
+      );
+      allow update: if isSignedIn() && (
+        request.auth.uid == userId ||
+        (isAdult() &&
+         resource.data.familyId == userFamilyId() &&
+         request.resource.data.familyId == userFamilyId())
+      );
       allow delete: if false;
     }
 
@@ -43,9 +58,14 @@ service cloud.firestore {
       allow create: if isSignedIn();
     }
 
-    // Outbound authorization queue
+    // Outbound authorization queue — family-scoped when familyId is present
     match /outbound_queue/{itemId} {
-      allow read, create, update: if isSignedIn();
+      allow read, update: if isSignedIn() && (
+        !('familyId' in resource.data) || belongsToFamily(resource.data.familyId)
+      );
+      allow create: if isSignedIn() && (
+        !('familyId' in request.resource.data) || belongsToFamily(request.resource.data.familyId)
+      );
       allow delete: if false;
     }
 
@@ -57,9 +77,14 @@ service cloud.firestore {
       allow create: if isSignedIn();
     }
 
-    // Audit logs — append-only
+    // Audit logs — append-only; family-scoped when familyId is present
     match /audit_logs/{logId} {
-      allow read, create: if isSignedIn();
+      allow read: if isSignedIn() && (
+        !('familyId' in resource.data) || belongsToFamily(resource.data.familyId)
+      );
+      allow create: if isSignedIn() && (
+        !('familyId' in request.resource.data) || belongsToFamily(request.resource.data.familyId)
+      );
       allow update, delete: if false;
     }
 
