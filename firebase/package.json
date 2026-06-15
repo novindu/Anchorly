@@ -4,6 +4,7 @@
   "scripts": {
     "deploy:rules": "node scripts/deploy-rules.mjs",
     "deploy:hosting": "node scripts/deploy-hosting.mjs",
+    "preflight:auth": "node scripts/test-initialize-flow.mjs",
     "deploy:beta": "node scripts/deploy-rules.mjs && node scripts/deploy-hosting.mjs"
   },
   "devDependencies": {

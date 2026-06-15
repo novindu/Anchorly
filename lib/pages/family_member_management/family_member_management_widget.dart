@@ -55,6 +55,7 @@ class _FamilyMemberManagementWidgetState
 
   @override
   Widget build(BuildContext context) {
+    context.watch<FFAppState>();
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).unfocus();
@@ -268,14 +269,36 @@ class _FamilyMemberManagementWidgetState
 
                                 // ff_lite_listview_data:${users.all}
                                 StreamBuilder<List<UsersRecord>>(
-                                  stream: queryUsersRecord(
-                                    queryBuilder: (q) => familyScopedQuery(
-                                      q,
-                                      familyId: widget.familyGroupRef?.id,
-                                    ),
-                                  ),
+                                  stream: FFAppState().cloudSyncActive
+                                      ? queryUsersRecord(
+                                          queryBuilder: (q) =>
+                                              familyScopedQuery(
+                                            q,
+                                            familyId:
+                                                widget.familyGroupRef?.id,
+                                          ),
+                                        )
+                                      : Stream.value(<UsersRecord>[]),
                                   builder: (context, snapshot) {
-                                    // Customize what your widget looks like when it's loading.
+                                    if (!FFAppState().cloudSyncActive) {
+                                      return MemberRowWidget(
+                                        key: const Key('local_admin_member'),
+                                        initials: 'FA',
+                                        name: 'Family Admin (local)',
+                                        role: 'Adult',
+                                        status: 'active',
+                                      );
+                                    }
+                                    if (snapshot.hasError) {
+                                      return Text(
+                                        'Could not load members: ${snapshot.error}',
+                                        style: TextStyle(
+                                          color: FlutterFlowTheme.of(context)
+                                              .error,
+                                          fontSize: 12,
+                                        ),
+                                      );
+                                    }
                                     if (!snapshot.hasData) {
                                       return Center(
                                         child: SizedBox(
@@ -626,6 +649,16 @@ class _FamilyMemberManagementWidgetState
                             hoverColor: Colors.transparent,
                             highlightColor: Colors.transparent,
                             onTap: () async {
+                              if (!FFAppState().cloudSyncActive) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      'Cloud sync is off. Enable Firebase Authentication in Console, then re-initialize to add members.',
+                                    ),
+                                  ),
+                                );
+                                return;
+                              }
                               if (widget.familyGroupRef == null) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(content: Text('No familyGroupRef - go back and use Initialize Family Vault or Manage from dashboard.')),

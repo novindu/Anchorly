@@ -74,6 +74,91 @@ class _FamilyDashboardWidgetState extends State<FamilyDashboardWidget> {
       );
     }
 
+    final cloudBanner = !FFAppState().cloudSyncActive
+        ? Padding(
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: FlutterFlowTheme.of(context).info10,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: FlutterFlowTheme.of(context).info,
+                ),
+              ),
+              child: Text(
+                'Local-only mode: Firebase Authentication is not enabled yet. '
+                'You can explore the app; cloud sync (members, queue, audit) activates after Auth is set up in Firebase Console.',
+                style: FlutterFlowTheme.of(context).bodySmall.override(
+                      fontSize: 11,
+                    ),
+              ),
+            ),
+          )
+        : const SizedBox.shrink();
+
+    if (!FFAppState().cloudSyncActive) {
+      return Scaffold(
+        key: scaffoldKey,
+        backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+        body: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              cloudBanner,
+              Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Family Dashboard',
+                      style: FlutterFlowTheme.of(context).headlineMedium,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Vault initialized on this device. Enable Firebase Authentication to sync tasks, members, and the outbound queue to the cloud.',
+                      style: FlutterFlowTheme.of(context).bodyMedium,
+                    ),
+                    const SizedBox(height: 16),
+                    if (FFAppState().currentUserRole == 'Adult')
+                      InkWell(
+                        onTap: () async {
+                          context.goNamed(
+                            FamilyMemberManagementWidget.routeName,
+                            queryParameters: {
+                              'familyGroupRef': serializeParam(
+                                FamilyGroupsRecord.collection
+                                    .doc(FFAppState().activeFamilyId),
+                                ParamType.DocumentReference,
+                              ),
+                            }.withoutNulls,
+                          );
+                        },
+                        child: wrapWithModel(
+                          model: _model.buttonModel1,
+                          updateCallback: () => safeSetState(() {}),
+                          child: ButtonWidget(
+                            content: 'Manage Family',
+                            iconPresent: false,
+                            iconEndPresent: false,
+                            variant: 'primary',
+                            size: 'medium',
+                            fullWidth: false,
+                            loading: false,
+                            disabled: false,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return StreamBuilder<List<OutboundQueueRecord>>(
       stream: queryOutboundQueueRecord(
         queryBuilder: (q) => familyScopedQuery(q),

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import '/backend/backend.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'flutter_flow/flutter_flow_util.dart';
 
 class FFAppState extends ChangeNotifier {
   static FFAppState _instance = FFAppState._internal();
@@ -16,7 +14,23 @@ class FFAppState extends ChangeNotifier {
     _instance = FFAppState._internal();
   }
 
-  Future initializePersistedState() async {}
+  static const _kActiveFamilyId = 'ff_activeFamilyId';
+  static const _kCurrentUserRole = 'ff_currentUserRole';
+  static const _kCloudSyncActive = 'ff_cloudSyncActive';
+
+  Future initializePersistedState() async {
+    final prefs = await SharedPreferences.getInstance();
+    _activeFamilyId = prefs.getString(_kActiveFamilyId) ?? '';
+    _currentUserRole = prefs.getString(_kCurrentUserRole) ?? 'Adult';
+    _cloudSyncActive = prefs.getBool(_kCloudSyncActive) ?? false;
+  }
+
+  Future persistState() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_kActiveFamilyId, _activeFamilyId);
+    await prefs.setString(_kCurrentUserRole, _currentUserRole);
+    await prefs.setBool(_kCloudSyncActive, _cloudSyncActive);
+  }
 
   void update(VoidCallback callback) {
     callback();
@@ -33,5 +47,11 @@ class FFAppState extends ChangeNotifier {
   String get activeFamilyId => _activeFamilyId;
   set activeFamilyId(String value) {
     _activeFamilyId = value;
+  }
+
+  bool _cloudSyncActive = false;
+  bool get cloudSyncActive => _cloudSyncActive;
+  set cloudSyncActive(bool value) {
+    _cloudSyncActive = value;
   }
 }

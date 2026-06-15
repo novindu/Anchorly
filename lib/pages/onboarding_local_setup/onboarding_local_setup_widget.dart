@@ -1,14 +1,12 @@
 import '/components/button/button_widget.dart';
-import 'package:firebase_auth/firebase_auth.dart'; // for current user in Initialize (already used elsewhere in project auth layer)
 import '/components/setup_step/setup_step_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import 'dart:ui';
 import '/index.dart';
-import '/custom_code/actions/ensure_anonymous_auth.dart';
+import '/custom_code/actions/initialize_family_vault.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -38,6 +36,7 @@ class _OnboardingLocalSetupWidgetState
   bool _agreedUserAgreement = false;
   bool _agreedPrivacyPolicy = false;
   bool _agreedLocalDataTerms = false;
+  bool _initializingVault = false;
 
   // Sample policy texts (for in-app dialogs on front page consent).
   // TODO: Replace with your final legal copy generated from the prompts below.
@@ -572,68 +571,60 @@ Column(
                                       hoverColor: Colors.transparent,
                                       highlightColor: Colors.transparent,
                                       onTap: () async {
-                                        // Full Initialize Family Vault (addresses major pain point):
-                                        // - Creates the family_groups doc in Firestore (with the Save Rules toggles).
-                                        // - Writes familyId + role back to the current user's users doc (for hydration).
-                                        // - Sets FFAppState activeFamilyId + currentUserRole immediately (reliable hydration).
-                                        // - Then navigates with a real familyGroupRef (so Save Rules etc. work without placeholder).
-                                        // Consent (3 checkboxes) already required via disabled + compliance comments.
-                                        // This syncs the local heavy export with current FF7 cloud expectations + completes the local E2EE story.
-                                        if (!(_agreedUserAgreement && _agreedPrivacyPolicy && _agreedLocalDataTerms)) {
+                                        if (!(_agreedUserAgreement &&
+                                            _agreedPrivacyPolicy &&
+                                            _agreedLocalDataTerms)) {
+                                          return;
+                                        }
+                                        if (_initializingVault) {
                                           return;
                                         }
 
+                                        safeSetState(() => _initializingVault = true);
                                         try {
-                                          final firestore = FirebaseFirestore.instance;
-                                          final authUser = await ensureAnonymousAuth();
+                                          final result =
+                                              await initializeFamilyVault();
 
-                                          // Create new family group (use auto-ID so we have a real ref immediately)
-                                          final newFamilyRef = firestore.collection('family_groups').doc();
-                                          final newFamilyId = newFamilyRef.id;
+                                          if (!mounted) return;
 
-                                          await newFamilyRef.set({
-                                            'groupName': 'My Family', // TODO: bind to a real text field / SetupStep input if present in this page's model
-                                            'multiAdultApproval': true,
-                                            'auditAccess': true,
-                                            'signatureSharing': true,
-                                          });
+                                          if (result.notice != null) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                content: Text(result.notice!),
+                                                duration:
+                                                    const Duration(seconds: 8),
+                                              ),
+                                            );
+                                          }
 
-                                          // Write back to the logged-in user doc (hydration source of truth)
-                                          await firestore.collection('users').doc(authUser.uid).set({
-                                            'familyId': newFamilyId,
-                                            'role': 'Adult',
-                                            'name': 'Family Admin',
-                                            'initials': 'FA',
-                                            'status': 'active',
-                                          }, SetOptions(merge: true));
-
-                                          await firestore.collection('audit_logs').add({
-                                            'actionType': 'VAULT_INITIALIZED',
-                                            'actorName': 'Family Admin',
-                                            'timestamp': DateTime.now().toIso8601String(),
-                                            'detailIcon': 'shield',
-                                            'detailText': 'Family vault initialized',
-                                            'familyId': newFamilyId,
-                                          });
-
-                                          // Hydrate AppState right away (fixes the reliable hydration pain point)
-                                          FFAppState().activeFamilyId = newFamilyId;
-                                          FFAppState().currentUserRole = 'Adult';
-
-                                          // Now navigate with the *real* familyGroupRef (matches the pattern expected by FamilyMemberManagement Save Rules)
                                           context.goNamed(
-                                            FamilyMemberManagementWidget.routeName,
+                                            FamilyMemberManagementWidget
+                                                .routeName,
                                             queryParameters: {
                                               'familyGroupRef': serializeParam(
-                                                newFamilyRef,
+                                                result.familyGroupRef,
                                                 ParamType.DocumentReference,
                                               ),
                                             }.withoutNulls,
                                           );
                                         } catch (e) {
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            SnackBar(content: Text('Initialize failed: $e. Check Firebase rules and auth.')),
+                                          if (!mounted) return;
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                'Initialize failed: $e',
+                                              ),
+                                              duration:
+                                                  const Duration(seconds: 10),
+                                            ),
                                           );
+                                        } finally {
+                                          if (mounted) {
+                                            safeSetState(
+                                                () => _initializingVault = false);
+                                          }
                                         }
                                       },
                                       child: wrapWithModel(
@@ -647,8 +638,11 @@ Column(
                                           variant: 'primary',
                                           size: 'large',
                                           fullWidth: true,
-                                          loading: false,
-                                          disabled: !(_agreedUserAgreement && _agreedPrivacyPolicy && _agreedLocalDataTerms),
+                                          loading: _initializingVault,
+                                          disabled: _initializingVault ||
+                                              !(_agreedUserAgreement &&
+                                                  _agreedPrivacyPolicy &&
+                                                  _agreedLocalDataTerms),
                                         ),
                                       ),
                                     ),
